@@ -1,3 +1,3 @@
 def call(String imageName, String tag) {
-    sh "docker push ${imageName}:${tag}"
+    sh "${env.DOCKER} push ${imageName}:${tag}"
 }

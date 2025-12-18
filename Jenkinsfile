@@ -1,3 +1,5 @@
+@Library('jenkins-shared-library') _
+
 pipeline {
     agent any
 
@@ -12,6 +14,7 @@ pipeline {
     }
 
     stages {
+
         stage('Checkout') {
             steps {
                 checkout scm
@@ -45,30 +48,43 @@ pipeline {
 
         stage('Docker Login') {
             steps {
-                withCredentials([usernamePassword(credentialsId: 'docker-hub-creds', 
-                                                 usernameVariable: 'DOCKER_USER', 
-                                                 passwordVariable: 'DOCKER_TOKEN')]) {
+                withCredentials([usernamePassword(
+                    credentialsId: 'docker-hub-creds',
+                    usernameVariable: 'DOCKER_USER',
+                    passwordVariable: 'DOCKER_TOKEN'
+                )]) {
                     sh "${DOCKER} login -u $DOCKER_USER -p $DOCKER_TOKEN"
                 }
             }
         }
 
-        stage('Docker Build Backend') {
+        stage('Docker Build') {
             steps {
-                sh "${DOCKER} build -t ${DOCKER_REGISTRY}/${BACKEND_IMAGE}:${BUILD_NUMBER} backend"
-            }
-        }
+                dockerBuild(
+                    'backend',
+                    "${DOCKER_REGISTRY}/${BACKEND_IMAGE}",
+                    BUILD_NUMBER
+                )
 
-        stage('Docker Build Frontend') {
-            steps {
-                sh "${DOCKER} build -t ${DOCKER_REGISTRY}/${FRONTEND_IMAGE}:${BUILD_NUMBER} frontend"
+                dockerBuild(
+                    'frontend',
+                    "${DOCKER_REGISTRY}/${FRONTEND_IMAGE}",
+                    BUILD_NUMBER
+                )
             }
         }
 
         stage('Docker Push') {
             steps {
-                sh "${DOCKER} push ${DOCKER_REGISTRY}/${BACKEND_IMAGE}:${BUILD_NUMBER}"
-                sh "${DOCKER} push ${DOCKER_REGISTRY}/${FRONTEND_IMAGE}:${BUILD_NUMBER}"
+                dockerPush(
+                    "${DOCKER_REGISTRY}/${BACKEND_IMAGE}",
+                    BUILD_NUMBER
+                )
+
+                dockerPush(
+                    "${DOCKER_REGISTRY}/${FRONTEND_IMAGE}",
+                    BUILD_NUMBER
+                )
             }
         }
     }

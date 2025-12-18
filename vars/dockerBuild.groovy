@@ -1,3 +1,3 @@
 def call(String dir, String imageName, String tag) {
-    sh "cd ${dir} && docker build -t ${imageName}:${tag} ."
+    sh "${env.DOCKER} build -t ${imageName}:${tag} ${dir}"
 }
