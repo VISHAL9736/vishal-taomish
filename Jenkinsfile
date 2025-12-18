@@ -43,6 +43,16 @@ pipeline {
             }
         }
 
+        stage('Docker Login') {
+            steps {
+                withCredentials([usernamePassword(credentialsId: 'docker-hub-creds', 
+                                                 usernameVariable: 'DOCKER_USER', 
+                                                 passwordVariable: 'DOCKER_TOKEN')]) {
+                    sh 'docker login -u $DOCKER_USER -p $DOCKER_TOKEN'
+                }
+            }
+        }
+
         stage('Docker Build Backend') {
             steps {
                 sh "${DOCKER} build -t ${DOCKER_REGISTRY}/${BACKEND_IMAGE}:${BUILD_NUMBER} backend"
