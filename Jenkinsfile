@@ -8,7 +8,7 @@ pipeline {
         MAVEN = '/Users/vishal/apache-maven-3.9.11/bin/mvn'
         DOCKER = '/usr/local/bin/docker'
         NODE_HOME = '/Users/vishal/.nvm/versions/node/v22.19.0'
-        PATH = "/Users/vishal/.nvm/versions/node/v22.19.0/bin:${env.PATH}"
+        PATH = "/Users/vishal/.nvm/versions/node/v22.19.0/bin:/usr/local/bin:${env.PATH}"
     }
 
     stages {
@@ -48,7 +48,7 @@ pipeline {
                 withCredentials([usernamePassword(credentialsId: 'docker-hub-creds', 
                                                  usernameVariable: 'DOCKER_USER', 
                                                  passwordVariable: 'DOCKER_TOKEN')]) {
-                    sh 'docker login -u $DOCKER_USER -p $DOCKER_TOKEN'
+                    sh "${DOCKER} login -u $DOCKER_USER -p $DOCKER_TOKEN"
                 }
             }
         }
