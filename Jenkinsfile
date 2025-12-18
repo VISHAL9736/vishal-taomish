@@ -7,6 +7,7 @@ pipeline {
         FRONTEND_IMAGE = 'todo-frontend'
         MAVEN = '/Users/vishal/apache-maven-3.9.11/bin/mvn'
         DOCKER = '/usr/local/bin/docker'
+        NPM = '/Users/vishal/.nvm/versions/node/v22.19.0/bin/npm'
     }
 
     stages {
@@ -35,34 +36,28 @@ pipeline {
         stage('Build Frontend') {
             steps {
                 dir('frontend') {
-                    sh 'npm install'
-                    sh 'npm run build'
+                    sh "${NPM} install"
+                    sh "${NPM} run build"
                 }
             }
         }
 
         stage('Docker Build Backend') {
             steps {
-                script {
-                    dockerBuild('backend', "${DOCKER_REGISTRY}/${BACKEND_IMAGE}", env.BUILD_NUMBER)
-                }
+                sh "${DOCKER} build -t ${DOCKER_REGISTRY}/${BACKEND_IMAGE}:${BUILD_NUMBER} backend"
             }
         }
 
         stage('Docker Build Frontend') {
             steps {
-                script {
-                    dockerBuild('frontend', "${DOCKER_REGISTRY}/${FRONTEND_IMAGE}", env.BUILD_NUMBER)
-                }
+                sh "${DOCKER} build -t ${DOCKER_REGISTRY}/${FRONTEND_IMAGE}:${BUILD_NUMBER} frontend"
             }
         }
 
         stage('Docker Push') {
             steps {
-                script {
-                    dockerPush("${DOCKER_REGISTRY}/${BACKEND_IMAGE}", env.BUILD_NUMBER)
-                    dockerPush("${DOCKER_REGISTRY}/${FRONTEND_IMAGE}", env.BUILD_NUMBER)
-                }
+                sh "${DOCKER} push ${DOCKER_REGISTRY}/${BACKEND_IMAGE}:${BUILD_NUMBER}"
+                sh "${DOCKER} push ${DOCKER_REGISTRY}/${FRONTEND_IMAGE}:${BUILD_NUMBER}"
             }
         }
     }
