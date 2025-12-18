@@ -1,4 +1,5 @@
-FROM eclipse-temurin:21-jdk-alpine
+# Multi-stage build for optimization
+FROM eclipse-temurin:21-jdk-alpine AS build
 
 WORKDIR /app
 
@@ -7,6 +8,12 @@ COPY src ./src
 
 RUN apk add --no-cache maven && mvn clean package -DskipTests
 
+FROM eclipse-temurin:21-jre-alpine
+
+WORKDIR /app
+
+COPY --from=build /app/target/backend-1.0-SNAPSHOT.jar app.jar
+
 EXPOSE 8080
 
-CMD ["java", "-jar", "target/backend-1.0-SNAPSHOT.jar"]
+CMD ["java", "-jar", "app.jar"]
