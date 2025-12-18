@@ -2,9 +2,11 @@ pipeline {
     agent any
 
     environment {
-        DOCKER_REGISTRY = 'your-registry.com'
+        DOCKER_REGISTRY = 'vishal0786'
         BACKEND_IMAGE = 'todo-backend'
         FRONTEND_IMAGE = 'todo-frontend'
+        MAVEN = '/Users/vishal/apache-maven-3.9.11/bin/mvn'
+        DOCKER = '/usr/local/bin/docker'
     }
 
     stages {
@@ -17,7 +19,7 @@ pipeline {
         stage('Build Backend') {
             steps {
                 dir('backend') {
-                    sh 'mvn clean compile'
+                    sh "${MAVEN} clean compile"
                 }
             }
         }
@@ -25,7 +27,7 @@ pipeline {
         stage('Test Backend') {
             steps {
                 dir('backend') {
-                    sh 'mvn test'
+                    sh "${MAVEN} test"
                 }
             }
         }
@@ -67,7 +69,7 @@ pipeline {
 
     post {
         always {
-            sh 'docker system prune -f'
+            sh "${DOCKER} system prune -f"
         }
         success {
             echo 'Pipeline succeeded!'
