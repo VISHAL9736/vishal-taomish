@@ -7,8 +7,8 @@ pipeline {
         FRONTEND_IMAGE = 'todo-frontend'
         MAVEN = '/Users/vishal/apache-maven-3.9.11/bin/mvn'
         DOCKER = '/usr/local/bin/docker'
-        NODE = '/Users/vishal/.nvm/versions/node/v22.19.0/bin/node'
-        NPM = '/Users/vishal/.nvm/versions/node/v22.19.0/bin/npm'
+        NODE_HOME = '/Users/vishal/.nvm/versions/node/v22.19.0'
+        PATH = "/Users/vishal/.nvm/versions/node/v22.19.0/bin:${env.PATH}"
     }
 
     stages {
@@ -37,9 +37,8 @@ pipeline {
         stage('Build Frontend') {
             steps {
                 dir('frontend') {
-                    // Use NODE to run npm to ensure node is found
-                    sh "${NODE} ${NPM} install"
-                    sh "${NODE} ${NPM} run build"
+                    sh "npm install"
+                    sh "npm run build"
                 }
             }
         }
